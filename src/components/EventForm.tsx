@@ -5,10 +5,17 @@ import { Moment } from 'moment';
 import { rules } from '../utils/rules';
 import { IUser } from '../models/IUser';
 import { IEvent } from '../models/IEvent';
+import { formatDate } from '../utils/formatDate';
+import { useTypedSelector } from '../hooks/useTypedSelector';
 
-export const EventForm: FC<{ guests: IUser[] }> = (props) => {
+export const EventForm: FC<{
+  guests: IUser[];
+  submit: (event: IEvent) => void;
+}> = (props) => {
   const selectDate = (date: Moment | null) => {
-    console.log(date);
+    if (date) {
+      setEvent({ ...event, date: formatDate(date.toDate()) });
+    }
   };
 
   const [event, setEvent] = useState<IEvent>({
@@ -17,8 +24,15 @@ export const EventForm: FC<{ guests: IUser[] }> = (props) => {
     description: '',
     guest: '',
   } as IEvent);
+
+  const { user } = useTypedSelector((state) => state.auth);
+
+  const submitForm = () => {
+    props.submit({ ...event, author: user.username });
+  };
+
   return (
-    <Form>
+    <Form onFinish={submitForm}>
       <Form.Item
         label="Event Description"
         name="description"
@@ -29,7 +43,14 @@ export const EventForm: FC<{ guests: IUser[] }> = (props) => {
           value={event.description}
         />
       </Form.Item>
-      <FormItem label="Event Date" name="date" rules={[rules.required()]}>
+      <FormItem
+        label="Event Date"
+        name="date"
+        rules={[
+          rules.required(),
+          rules.isDateAfter('This is date after, you can not set this date!'),
+        ]}
+      >
         <DatePicker onChange={(date) => selectDate(date)} />
       </FormItem>
       <Form.Item label="Choose guest" name="guest" rules={[rules.required()]}>
