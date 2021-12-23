@@ -5,7 +5,7 @@ import { Moment } from 'moment';
 import { rules } from '../utils/rules';
 import { IUser } from '../models/IUser';
 import { IEvent } from '../models/IEvent';
-import { formatDate } from '../utils/formatDate';
+import { formatDate } from '../utils/date';
 import { useTypedSelector } from '../hooks/useTypedSelector';
 
 export const EventForm: FC<{
